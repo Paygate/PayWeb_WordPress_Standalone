@@ -1,8 +1,8 @@
 # PayWeb_Wordpress_Standalone
 
-## PayGate Standalone plugin v1.0.0 for Wordpress v5.8
+## PayGate PayWeb Standalone plugin v1.0.0 for Wordpress v5.8
 
-This is the PayGate PayWeb3 plugin for for Wordpress Standalone. Please feel free to contact the PayGate support team at support@paygate.co.za should you require any assistance.
+This is the PayGate PayWeb Standalone plugin for Wordpress. Please feel free to contact the PayGate support team at support@paygate.co.za should you require any assistance.
 
 ## Installation
 
