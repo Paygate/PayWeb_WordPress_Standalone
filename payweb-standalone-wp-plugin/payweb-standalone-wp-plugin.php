@@ -4,7 +4,7 @@
  * Plugin Name: PayGate PayWeb Standalone for Wordpress
  * Plugin URI: https://github.com/PayGate/PayWeb_Wordpress_Standalone
  * Description: Accept payments for WooCommerce using PayWeb's online payments service
- * Version: 1.0.0
+ * Version: 1.0.1
  * Tested: 5.8.0
  * Author: PayGate (Pty) Ltd
  * Author URI: https://www.paygate.com/africa/
@@ -206,6 +206,7 @@ function register_payweb_standalone_plugin_settings()
     register_setting('payweb_standalone_plugin_options', 'payweb_standalone_title');
     register_setting('payweb_standalone_plugin_options', 'payweb_standalone_paygate_id');
     register_setting('payweb_standalone_plugin_options', 'payweb_standalone_encryption_key');
+    register_setting('payweb_standalone_plugin_options', 'payweb_standalone_recaptcha_key');
     register_setting('payweb_standalone_plugin_options', 'payweb_standalone_test_mode');
     register_setting('payweb_standalone_plugin_options', 'payweb_standalone_success_url');
     register_setting('payweb_standalone_plugin_options', 'payweb_standalone_failure_url');
@@ -225,9 +226,16 @@ function payweb_standalone_init()
 function add_payweb_standalone_payment_shortcode()
 {
     $url = admin_url() . 'admin-post.php';
+    $recaptcha_key = get_option('payweb_standalone_recaptcha_key');
 
     $html = <<<HTML
-<form method="post" action="$url">
+     <script src="https://www.google.com/recaptcha/api.js"></script>
+     <script>
+       function onSubmit(token) {
+         document.getElementById("payweb-standalone-form").submit();
+       }
+     </script>
+<form method="post" action="$url" id="payweb-standalone-form">
     <input type="hidden" name="action" value="payweb_standalone_wp_payment">
     <table class="form-table">
         <tbody>
@@ -239,7 +247,10 @@ function add_payweb_standalone_payment_shortcode()
                     <input style="width:100%" type="number" name="payweb_standalone_payment_amount" step="0.01" placeholder="Amount" required="">
                 </td>
                 <td style="background-color: transparent;" colspan="1">
-                    <button style="width:100%" type="submit">Pay Now</button>
+                    <button style="width:100%" class="g-recaptcha" 
+        data-sitekey="$recaptcha_key" 
+        data-callback='onSubmit' 
+        data-action='submit' type="submit">Pay Now</button>
                 </td>
             </tr>
         </tbody>
@@ -320,6 +331,14 @@ function payweb_standalone_option_page_content()
                     <input type="text" name="payweb_standalone_encryption_key" id="payweb_standalone_encryption_key"
                            value="<?php
                            echo get_option('payweb_standalone_encryption_key'); ?>"><br><span class="description"> Enter Encryption Key </span>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">Encryption Key</th>
+                <td>
+                    <input type="text" name="payweb_standalone_recaptcha_key" id="payweb_standalone_recaptcha_key"
+                           value="<?php
+                           echo get_option('payweb_standalone_recaptcha_key'); ?>"><br><span class="description"> Enter Recaptcha Key </span>
                 </td>
             </tr>
 
