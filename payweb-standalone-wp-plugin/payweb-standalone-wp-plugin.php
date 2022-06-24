@@ -70,6 +70,9 @@ function payweb_standalone_wp_payment()
         return;
     }
 
+    /** Validate reCAPTCHA **/
+    validate_form();
+
     $test_mode = get_option('payweb_standalone_test_mode') == 'yes';
 
     $payweb = new Payweb($test_mode);
@@ -207,6 +210,7 @@ function register_payweb_standalone_plugin_settings()
     register_setting('payweb_standalone_plugin_options', 'payweb_standalone_paygate_id');
     register_setting('payweb_standalone_plugin_options', 'payweb_standalone_encryption_key');
     register_setting('payweb_standalone_plugin_options', 'payweb_standalone_recaptcha_key');
+    register_setting('payweb_standalone_plugin_options', 'payweb_standalone_recaptcha_secret');
     register_setting('payweb_standalone_plugin_options', 'payweb_standalone_test_mode');
     register_setting('payweb_standalone_plugin_options', 'payweb_standalone_success_url');
     register_setting('payweb_standalone_plugin_options', 'payweb_standalone_failure_url');
@@ -225,7 +229,7 @@ function payweb_standalone_init()
 
 function add_payweb_standalone_payment_shortcode()
 {
-    $url = admin_url() . 'admin-post.php';
+    $url           = admin_url() . 'admin-post.php';
     $recaptcha_key = get_option('payweb_standalone_recaptcha_key');
 
     $html = <<<HTML
@@ -250,7 +254,7 @@ function add_payweb_standalone_payment_shortcode()
                     <button style="width:100%" class="g-recaptcha" 
         data-sitekey="$recaptcha_key" 
         data-callback='onSubmit' 
-        data-action='submit' type="submit">Pay Now</button>
+        data-action='payweb_standalone_wp_payment' type="submit">Pay Now</button>
                 </td>
             </tr>
         </tbody>
@@ -334,11 +338,20 @@ function payweb_standalone_option_page_content()
                 </td>
             </tr>
             <tr>
-                <th scope="row">Encryption Key</th>
+                <th scope="row">Recaptcha Key</th>
                 <td>
                     <input type="text" name="payweb_standalone_recaptcha_key" id="payweb_standalone_recaptcha_key"
                            value="<?php
                            echo get_option('payweb_standalone_recaptcha_key'); ?>"><br><span class="description"> Enter Recaptcha Key </span>
+                </td>
+            </tr>
+
+            <tr>
+                <th scope="row">Recaptcha Secret</th>
+                <td>
+                    <input type="text" name="payweb_standalone_recaptcha_secret" id="payweb_standalone_recaptcha_secret"
+                           value="<?php
+                           echo get_option('payweb_standalone_recaptcha_secret'); ?>"><br><span class="description"> Enter Recaptcha Secret </span>
                 </td>
             </tr>
 
@@ -377,4 +390,32 @@ function payweb_standalone_option_page_content()
         submit_button('Save Settings'); ?>
     </form>
     <?php
+}
+
+
+function validate_form()
+{
+    $referer_location = $_SERVER['HTTP_REFERER'];
+    $token            = $_POST['g-recaptcha-response'];
+    $action           = $_POST['action'];
+    $secret           = get_option('payweb_standalone_recaptcha_secret');
+
+    // call curl to POST request
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "https://www.google.com/recaptcha/api/siteverify");
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('secret' => $secret, 'response' => $token)));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    $arrResponse = json_decode($response, true);
+
+    // verify the response
+    if ($arrResponse["success"] == '1' && $arrResponse["action"] == $action && $arrResponse["score"] >= 0.5) {
+        return true;
+    } else {
+        // spam submission
+        header('Location:' . $referer_location);
+        exit(0);
+    }
 }
