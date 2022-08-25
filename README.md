@@ -2,7 +2,7 @@
 
 ## PayGate PayWeb Standalone plugin v1.0.1 for Wordpress v5.8
 
-This is the PayGate PayWeb Standalone plugin for Wordpress. Please feel free to contact the PayGate support team at support@paygate.co.za should you require any assistance.
+This is the PayGate PayWeb Standalone plugin for Wordpress. Please feel free to contact the PayGate support team at supportsa@dpogroup.com should you require any assistance.
 
 ## Installation
 
