@@ -4,8 +4,8 @@
  * Plugin Name: Paygate Standalone for WordPress
  * Plugin URI: https://github.com/Paygate/PayWeb_WordPress_Standalone
  * Description: Receive payments using the South African Paygate payments provider.
- * Version: 1.0.2
- * Tested: 6.5.2
+ * Version: 1.0.3
+ * Tested: 6.6.2
  * Author: Payfast (Pty) Ltd
  * Author URI: https://payfast.io/
  * Developer: App Inlet (Pty) Ltd
@@ -42,16 +42,17 @@ add_action('init', 'createPostType');
 function createPostType(): void
 {
     register_post_type(
-        'paygate_standalone_order',
+        'pg_standalone_order',
         array(
             'labels'       => array(
                 'name'          => __('Paygate Standalone Order'),
                 'singular_name' => __('Paygate Standalone Order')
             ),
             'public'       => true,
-            'has_archive'  => true,
-            'rewrite'      => array('slug' => 'paygate_standalone_order'),
-            'show_in_rest' => true,
+            'has_archive'  => false,
+            'rewrite'      => array('slug' => 'pg_standalone_order'),
+            'show_in_rest' => false,
+            "show_in_menu" => false,
 
         )
     );
@@ -87,7 +88,7 @@ function paygateStandaloneWPPayment(): void
 
     $post_id    = wp_insert_post(
         [
-            'post_type'   => 'paygate_standalone_order',
+            'post_type'   => 'pg_standalone_order',
             'post_status' => 'paygatesa_pending',
             'post_title'  => "PAYGATESA_order_$reference",
         ]
