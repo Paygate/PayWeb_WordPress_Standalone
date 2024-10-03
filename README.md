@@ -8,7 +8,7 @@ support@payfast.help should you require any assistance.
 ## Installation
 
 1. **Download the Plugin**
-    - Visit the [releases page](https://github.com/Paygate/PayWeb_WordPress_Standalone/releases) and download the latest release (currently v1.0.3). Unzip the downloaded file.
+    - Visit the [releases page](https://github.com/Paygate/PayWeb_WordPress_Standalone/releases) and download the latest release (currently v1.0.3).
 
 2. **Install the Plugin**
     - Log in to your WordPress Admin panel.
